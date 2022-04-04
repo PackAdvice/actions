@@ -62,7 +62,11 @@ echo '::group::PackAdvice version'
 echo '::endgroup::'
 
 echo "::group::PackAdvice output"
-./packadvice "$GITHUB_WORKSPACE/$INPUT_PATH" 2>&1
+./packadvice --export "$EXPORT_FILE_NAME" "$GITHUB_WORKSPACE/$INPUT_PATH" 2>&1
 echo '::endgroup::'
+
+if [ "$INPUT_COMMENT" = 'true' ]; then
+  node comment.mjs "$EXPORT_FILE_NAME"
+fi
 
 cd "$GITHUB_WORKSPACE"

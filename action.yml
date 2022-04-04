@@ -13,6 +13,17 @@ inputs:
     description: 'The PackAdvice version the action will use.'
     required: true
     default: 'latest'
+  comment:
+    description: 'If true, enable a result comment on the commit.'
+    required: true
+    default: 'true'
+  comment_repository:
+    description: 'If commit option is true, the full name of the target repository.'
+    required: true
+    default: ${{ github.repository }}
+  comment_sha:
+    description: 'If commit option is true, the commit SHA.'
+    required: false
 runs:
   using: 'docker'
   image: 'Dockerfile'
