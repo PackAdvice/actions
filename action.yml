@@ -1,0 +1,21 @@
+name: 'PackAdvice'
+description: 'A GitHub actions that provides advice for improving Minecraft Java Edition resource pack'
+inputs:
+  token:
+    description: 'The GitHub authentication token'
+    required: true
+    default: ${{ github.token }}
+  path:
+    description: 'Relative path from the repository root to the pack directory.'
+    required: true
+    default: '.'
+  version:
+    description: 'The PackAdvice version the action will use.'
+    required: true
+    default: 'latest'
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+branding:
+  icon: 'refresh-ccw'
+  color: 'green'

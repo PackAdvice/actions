@@ -1,0 +1,14 @@
+name: Test - Empty pack
+on: [push, workflow_dispatch]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Run PackAdvice
+        uses: ./ # Uses an action in the root directory
+        with:
+          path: test_pack/empty
