@@ -2,7 +2,7 @@ name: 'PackAdvice'
 description: 'A GitHub actions that provides advice for improving Minecraft Java Edition resource pack'
 inputs:
   token:
-    description: 'The GitHub authentication token'
+    description: 'The GitHub authentication token.'
     required: true
     default: ${{ github.token }}
   path:
