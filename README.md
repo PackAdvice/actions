@@ -25,5 +25,5 @@ jobs:
       - name: Clone repository
         uses: actions/checkout@v3
       - name: Run PackAdvice
-        uses: sya-ri/PackAdvice-action@v1
+        uses: PackAdvice/actions@v1
 ```
