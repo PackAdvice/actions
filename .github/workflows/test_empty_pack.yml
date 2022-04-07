@@ -1,5 +1,9 @@
 name: Test - Empty pack
-on: [push, workflow_dispatch]
+on:
+  push:
+    branches: ['**']
+    tags-ignore: ['**']
+  workflow_dispatch:
 jobs:
   test:
     runs-on: ubuntu-latest
