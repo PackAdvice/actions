@@ -4,14 +4,15 @@ A GitHub actions that provides advice for improving Minecraft Java Edition resou
 
 ## Options
 
-| Name                 | Default                                                            | Description                                                       |
-|----------------------|--------------------------------------------------------------------|-------------------------------------------------------------------|
-| `token`              | `${{ github.token }}`                                              | The GitHub authentication token.                                  |
-| `path`               | `.`                                                                | Relative path from the repository root to the pack directory.     |
-| `version`            | `latest`                                                           | The PackAdvice version the action will use.                       |
-| `comment`            | `true`                                                             | If true, enable a result comment on the commit.                   |
-| `comment_repository` | `${{ github.repository }}`                                         | If commit option is true, the full name of the target repository. |
-| `comment_sha`        | `${{ github.sha }}` or `${{ github.event.pull_request.head.sha }}` | If commit option is true, the commit SHA.                         |
+| Name                 | Default                                                            | Description                                                            |
+|----------------------|--------------------------------------------------------------------|------------------------------------------------------------------------|
+| `token`              | `${{ github.token }}`                                              | The GitHub authentication token.                                       |
+| `path`               | `.`                                                                | Relative path from the repository root to the pack directory.          |
+| `version`            | `latest`                                                           | The PackAdvice version the action will use.                            |
+| `comment`            | `true`                                                             | If true, enable a result comment on the commit.                        |
+| `comment_repository` | `${{ github.repository }}`                                         | If commit option is true, the full name of the target repository.      |
+| `comment_sha`        | `${{ github.sha }}` or `${{ github.event.pull_request.head.sha }}` | If commit option is true, the commit SHA.                              |
+| `comment_format`     | `{body}`                                                           | Change the comment to any format. `{body}` will be replaced to output. |
 
 ## Examples
 

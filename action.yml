@@ -24,6 +24,10 @@ inputs:
   comment_sha:
     description: 'If commit option is true, the commit SHA.'
     required: false
+  comment_format:
+    description: 'Change the comment to any format. `{body}` will be replaced to output.'
+    required: true
+    default: '{body}'
 runs:
   using: 'docker'
   image: 'Dockerfile'

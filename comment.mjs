@@ -17,7 +17,7 @@ async function run() {
             token: core.getInput("token"),
             repository: core.getInput("comment_repository"),
             sha: core.getInput("comment_sha"),
-            body: readFileSync(`${process.argv[2]}`, { encoding: 'utf8' }),
+            body: core.getInput("comment_format").replace("{body}", readFileSync(`${process.argv[2]}`, { encoding: 'utf8' })),
         };
         core.debug(`Inputs: ${inspect(inputs)}`);
 
