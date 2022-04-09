@@ -62,7 +62,7 @@ echo '::group::PackAdvice version'
 echo '::endgroup::'
 
 echo "::group::PackAdvice output"
-./packadvice --export "$EXPORT_FILE_NAME" "$GITHUB_WORKSPACE/$INPUT_PATH" 2>&1
+./packadvice --output "$EXPORT_FILE_NAME" "$GITHUB_WORKSPACE/$INPUT_PATH" 2>&1
 echo '::endgroup::'
 
 if [ "$INPUT_COMMENT" = 'true' ]; then
