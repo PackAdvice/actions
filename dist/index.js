@@ -29776,10 +29776,7 @@ const exec_1 = __nccwpck_require__(1514);
 const inputs = __importStar(__nccwpck_require__(7063));
 const fs = __importStar(__nccwpck_require__(7147));
 const unzipper = __importStar(__nccwpck_require__(1639));
-const fs_1 = __nccwpck_require__(7147);
-const os = __importStar(__nccwpck_require__(2037));
-const path = __importStar(__nccwpck_require__(1017));
-function downloadLatestArtifact(owner, repo, branch, workflow_id, artifact_name) {
+function downloadLatestArtifact(working_directory, owner, repo, branch, workflow_id, artifact_name) {
     return __awaiter(this, void 0, void 0, function* () {
         core.info(`Downloading latest ${artifact_name} artifact`);
         const octokit = github.getOctokit(core.getInput(inputs.Token));
@@ -29796,7 +29793,7 @@ function downloadLatestArtifact(owner, repo, branch, workflow_id, artifact_name)
             .sort(j => j.run_number)[0];
         if (!latestRun) {
             core.info(`Could not get the information API endpoint for the latest ${artifact_name} artifacts`);
-            return null;
+            return false;
         }
         core.debug(`Getting latest ${artifact_name} artifact download URL from endpoint`);
         const artifacts = yield octokit.request('GET /repos/{owner}/{repo}/actions/runs/{run_id}/artifacts', {
@@ -29807,7 +29804,7 @@ function downloadLatestArtifact(owner, repo, branch, workflow_id, artifact_name)
         const artifact = artifacts.data.artifacts.filter(j => j.name === artifact_name)[0];
         if (!artifact) {
             core.info(`Could not get the download URL for the latest ${artifact_name} artifact (#${latestRun.run_number})`);
-            return null;
+            return false;
         }
         const zip = yield octokit.request('GET /repos/{owner}/{repo}/actions/artifacts/{artifact_id}/{archive_format}', {
             owner: owner,
@@ -29816,16 +29813,13 @@ function downloadLatestArtifact(owner, repo, branch, workflow_id, artifact_name)
             archive_format: 'zip'
         });
         core.debug(`Extracting ${artifact_name} artifact archive (#${latestRun.run_number})`);
-        const dir = (0, fs_1.mkdtempSync)(path.join(os.tmpdir(), 'packadvice-'));
-        const zipPath = path.join(dir, 'artifact.zip');
-        if (yield (0, exec_1.exec)('curl', ['-sSL', '-o', zipPath, zip.url], { silent: true })) {
+        if (yield (0, exec_1.exec)('curl', ['-sSL', '-o', working_directory.artifact, zip.url], { silent: true })) {
             core.info(`Could not download the latest ${artifact_name} artifact`);
-            return null;
+            return false;
         }
-        const packadvicePath = path.join(dir, 'packadvice');
-        fs.createReadStream(zipPath).pipe(unzipper.Extract({ path: dir }));
+        fs.createReadStream(working_directory.artifact).pipe(unzipper.Extract({ path: working_directory.path }));
         core.info(`Successfully downloaded the latest ${artifact_name} artifact`);
-        return packadvicePath;
+        return true;
     });
 }
 exports.downloadLatestArtifact = downloadLatestArtifact;
@@ -29879,36 +29873,30 @@ const inputs = __importStar(__nccwpck_require__(7063));
 const download_executable_1 = __nccwpck_require__(2094);
 const fs = __importStar(__nccwpck_require__(7147));
 const exec_1 = __nccwpck_require__(1514);
-const path = __importStar(__nccwpck_require__(1017));
-const os = __importStar(__nccwpck_require__(2037));
 const comment_1 = __importDefault(__nccwpck_require__(3997));
+const working_directory_1 = __importDefault(__nccwpck_require__(1199));
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
+        const working_directory = new working_directory_1.default();
         const version = core.getInput(inputs.Version);
-        let packadvicePath = null;
         switch (version) {
             case 'latest': {
-                packadvicePath = yield (0, download_executable_1.downloadLatestArtifact)('sya-ri', 'PackAdvice', 'master', 23192113, 'PackAdvice executable (Linux, x64)');
+                yield (0, download_executable_1.downloadLatestArtifact)(working_directory, 'sya-ri', 'PackAdvice', 'master', 23192113, 'PackAdvice executable (Linux, x64)');
                 break;
             }
             default: {
                 core.setFailed(`Not found version: ${version}`);
             }
         }
-        if (!packadvicePath) {
-            core.setFailed('Failed to download the executable file.');
-            return;
-        }
-        fs.chmodSync(packadvicePath, '755');
+        fs.chmodSync(working_directory.packadvice, '755');
         core.startGroup('PackAdvice version');
-        yield (0, exec_1.exec)(packadvicePath, ['--version']);
+        yield (0, exec_1.exec)(working_directory.packadvice, ['--version']);
         core.endGroup();
-        const outputPath = path.join(os.tmpdir(), 'result.md');
         core.startGroup('PackAdvice output');
-        yield (0, exec_1.exec)(packadvicePath, ['--output', outputPath, core.getInput(inputs.Path)]);
+        yield (0, exec_1.exec)(working_directory.packadvice, ['--output', working_directory.output, core.getInput(inputs.Path)]);
         core.endGroup();
         if (core.getBooleanInput(inputs.Comment)) {
-            yield (0, comment_1.default)(fs.readFileSync(outputPath, { encoding: 'utf8' }));
+            yield (0, comment_1.default)(fs.readFileSync(working_directory.output, { encoding: 'utf8' }));
         }
     });
 }
@@ -29931,6 +29919,57 @@ exports.Comment = 'comment';
 exports.CommentRepository = 'comment_repository';
 exports.CommentSha = 'comment_sha';
 exports.CommentFormat = 'comment_format';
+
+
+/***/ }),
+
+/***/ 1199:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const path = __importStar(__nccwpck_require__(1017));
+const fs = __importStar(__nccwpck_require__(7147));
+class WorkingDirectory {
+    constructor() {
+        this.path = path.join(__dirname, '..', '..', 'packadvice');
+        fs.mkdirSync(this.path, { recursive: true });
+    }
+    get artifact() {
+        return path.join(this.path, 'artifact.zip');
+    }
+    get packadvice() {
+        return path.join(this.path, 'packadvice');
+    }
+    get output() {
+        return path.join(this.path, 'output.md');
+    }
+}
+exports["default"] = WorkingDirectory;
 
 
 /***/ }),

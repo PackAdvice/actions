@@ -3,16 +3,16 @@ import * as inputs from './inputs';
 import { downloadLatestArtifact } from './download_executable';
 import * as fs from 'fs';
 import { exec } from '@actions/exec';
-import * as path from 'path';
-import * as os from 'os';
 import comment from './comment';
+import WorkingDirectory from './working_directory';
 
 async function run() {
+  const working_directory = new WorkingDirectory();
   const version = core.getInput(inputs.Version);
-  let packadvicePath: string | null = null;
   switch (version) {
     case 'latest': {
-      packadvicePath = await downloadLatestArtifact(
+      await downloadLatestArtifact(
+        working_directory,
         'sya-ri',
         'PackAdvice',
         'master',
@@ -25,20 +25,15 @@ async function run() {
       core.setFailed(`Not found version: ${version}`);
     }
   }
-  if (!packadvicePath) {
-    core.setFailed('Failed to download the executable file.');
-    return;
-  }
-  fs.chmodSync(packadvicePath, '755');
+  fs.chmodSync(working_directory.packadvice, '755');
   core.startGroup('PackAdvice version');
-  await exec(packadvicePath, ['--version']);
+  await exec(working_directory.packadvice, ['--version']);
   core.endGroup();
-  const outputPath = path.join(os.tmpdir(), 'result.md');
   core.startGroup('PackAdvice output');
-  await exec(packadvicePath, ['--output', outputPath, core.getInput(inputs.Path)]);
+  await exec(working_directory.packadvice, ['--output', working_directory.output, core.getInput(inputs.Path)]);
   core.endGroup();
   if (core.getBooleanInput(inputs.Comment)) {
-    await comment(fs.readFileSync(outputPath, { encoding: 'utf8' }));
+    await comment(fs.readFileSync(working_directory.output, { encoding: 'utf8' }));
   }
 }
 

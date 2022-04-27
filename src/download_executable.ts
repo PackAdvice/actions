@@ -4,17 +4,16 @@ import { exec } from '@actions/exec';
 import * as inputs from './inputs';
 import * as fs from 'fs';
 import * as unzipper from 'unzipper';
-import { mkdtempSync } from 'fs';
-import * as os from 'os';
-import * as path from 'path';
+import WorkingDirectory from './working_directory';
 
 export async function downloadLatestArtifact(
+  working_directory: WorkingDirectory,
   owner: string,
   repo: string,
   branch: string,
   workflow_id: number,
   artifact_name: string
-): Promise<string | null> {
+): Promise<boolean> {
   core.info(`Downloading latest ${artifact_name} artifact`);
   const octokit = github.getOctokit(core.getInput(inputs.Token));
   core.debug(
@@ -37,7 +36,7 @@ export async function downloadLatestArtifact(
     core.info(
       `Could not get the information API endpoint for the latest ${artifact_name} artifacts`
     );
-    return null;
+    return false;
   }
   core.debug(`Getting latest ${artifact_name} artifact download URL from endpoint`);
   const artifacts = await octokit.request(
@@ -53,7 +52,7 @@ export async function downloadLatestArtifact(
     core.info(
       `Could not get the download URL for the latest ${artifact_name} artifact (#${latestRun.run_number})`
     );
-    return null;
+    return false;
   }
   const zip = await octokit.request(
     'GET /repos/{owner}/{repo}/actions/artifacts/{artifact_id}/{archive_format}',
@@ -65,14 +64,11 @@ export async function downloadLatestArtifact(
     }
   );
   core.debug(`Extracting ${artifact_name} artifact archive (#${latestRun.run_number})`);
-  const dir = mkdtempSync(path.join(os.tmpdir(), 'packadvice-'));
-  const zipPath = path.join(dir, 'artifact.zip');
-  if (await exec('curl', ['-sSL', '-o', zipPath, zip.url], { silent: true })) {
+  if (await exec('curl', ['-sSL', '-o', working_directory.artifact, zip.url], { silent: true })) {
     core.info(`Could not download the latest ${artifact_name} artifact`);
-    return null;
+    return false;
   }
-  const packadvicePath = path.join(dir, 'packadvice');
-  fs.createReadStream(zipPath).pipe(unzipper.Extract({ path: dir }));
+  fs.createReadStream(working_directory.artifact).pipe(unzipper.Extract({ path: working_directory.path }));
   core.info(`Successfully downloaded the latest ${artifact_name} artifact`);
-  return packadvicePath;
+  return true;
 }
