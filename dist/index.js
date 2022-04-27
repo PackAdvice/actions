@@ -29816,7 +29816,7 @@ function downloadLatestArtifact(owner, repo, branch, workflow_id, artifact_name)
             archive_format: 'zip'
         });
         core.debug(`Extracting ${artifact_name} artifact archive (#${latestRun.run_number})`);
-        const dir = (0, fs_1.mkdtempSync)(os.tmpdir());
+        const dir = (0, fs_1.mkdtempSync)(path.join(os.tmpdir(), 'packadvice-'));
         const zipPath = path.join(dir, 'artifact.zip');
         if (yield (0, exec_1.exec)('curl', ['-sSL', '-o', zipPath, zip.url], { silent: true })) {
             core.info(`Could not download the latest ${artifact_name} artifact`);

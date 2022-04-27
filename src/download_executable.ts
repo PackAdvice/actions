@@ -65,7 +65,7 @@ export async function downloadLatestArtifact(
     }
   );
   core.debug(`Extracting ${artifact_name} artifact archive (#${latestRun.run_number})`);
-  const dir = mkdtempSync(os.tmpdir());
+  const dir = mkdtempSync(path.join(os.tmpdir(), 'packadvice-'));
   const zipPath = path.join(dir, 'artifact.zip');
   if (await exec('curl', ['-sSL', '-o', zipPath, zip.url], { silent: true })) {
     core.info(`Could not download the latest ${artifact_name} artifact`);
