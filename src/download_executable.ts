@@ -71,7 +71,7 @@ export async function downloadLatestArtifact(
     core.info(`Could not download the latest ${artifact_name} artifact`);
     return null;
   }
-  const packadvicePath = path.join(dir, 'packadvicePath');
+  const packadvicePath = path.join(dir, 'packadvice');
   fs.createReadStream(zipPath).pipe(unzipper.Extract({ path: packadvicePath }));
   core.info(`Successfully downloaded the latest ${artifact_name} artifact`);
   return packadvicePath;
