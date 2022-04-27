@@ -29881,7 +29881,7 @@ function run() {
         const version = core.getInput(inputs.Version);
         switch (version) {
             case 'latest': {
-                yield (0, download_executable_1.downloadLatestArtifact)(working_directory, 'sya-ri', 'PackAdvice', 'master', 23192113, 'PackAdvice executable (Linux, x64)');
+                yield (0, download_executable_1.downloadLatestArtifact)(working_directory, 'PackAdvice', 'PackAdvice', 'master', 23192113, 'PackAdvice executable (Linux, x64)');
                 break;
             }
             default: {

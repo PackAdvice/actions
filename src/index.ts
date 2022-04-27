@@ -13,7 +13,7 @@ async function run() {
     case 'latest': {
       await downloadLatestArtifact(
         working_directory,
-        'sya-ri',
+        'PackAdvice',
         'PackAdvice',
         'master',
         23192113,
