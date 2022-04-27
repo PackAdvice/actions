@@ -29,8 +29,8 @@ inputs:
     required: true
     default: '{body}'
 runs:
-  using: 'node16'
-  main: 'dist/index.js'
+  using: 'docker'
+  image: 'Dockerfile'
 branding:
   icon: 'refresh-ccw'
   color: 'green'
