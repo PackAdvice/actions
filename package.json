@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "A GitHub actions that provides advice for improving Minecraft Java Edition resource pack.",
   "scripts": {
-    "build": "ncc build -o dist src/index.ts",
+    "build": "ncc build -o dist src/index.ts -m",
     "format": "prettier --write \"{,!(node_modules)/**/}*.ts\"",
     "format-check": "prettier --check \"{,!(node_modules)/**/}*.ts\""
   },
